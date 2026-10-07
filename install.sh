@@ -36,6 +36,20 @@ chown "$USER_NAME:$USER_NAME" "$H/.ssh/authorized_keys"; chmod 600 "$H/.ssh/auth
 echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER_NAME; chmod 440 /etc/sudoers.d/90-$USER_NAME
 
 install -m644 "$REPO/common/jail.local" /etc/fail2ban/jail.local
+
+# Network: DHCP on any wired port, never block boot when unplugged, cloud-init hands off
+if [ -d /etc/netplan ]; then
+  mkdir -p /etc/cloud/cloud.cfg.d
+  echo "network: {config: disabled}" > /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+  # drop the installer/cloud-init wired config (pinned to one MAC) unless it also holds Wi-Fi
+  f=/etc/netplan/50-cloud-init.yaml; [ -f $f ] && ! grep -q wifis $f && rm -f $f
+  install -m600 "$REPO/common/10-wired.yaml" /etc/netplan/10-wired.yaml
+  mkdir -p /etc/systemd/system/systemd-networkd-wait-online.service.d
+  printf '[Service]\nExecStart=\nExecStart=/usr/lib/systemd/systemd-networkd-wait-online --any --timeout=15\n' \
+    > /etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
+  systemctl daemon-reload
+  netplan generate
+fi
 systemctl enable --now avahi-daemon ssh fail2ban
 systemctl restart fail2ban
 
