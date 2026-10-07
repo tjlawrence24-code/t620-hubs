@@ -16,7 +16,7 @@ Its hostname should be `printhub` or `scanhub` — ask TJ which if `hostname` is
   reorder that file and re-run install.sh.
 
 ## Rules
-- Network is Google Fiber only, LAN 192.168.1.0/24. Printer (QIDI X-Plus 4, Moonraker) is at 192.168.1.243 unless TJ says otherwise
+- Network is Google Fiber only, LAN 192.168.1.0/24. Printer (QIDI X-Plus 4, Moonraker) is at 192.168.1.223 unless TJ says otherwise
   (override: `sudo PRINTER_IP=x.x.x.x ./install.sh printhub`).
 - Tailscale: only printhub is the subnet router. `sudo tailscale up --advertise-routes=192.168.1.0/24 --accept-routes=false`
   — NEVER accept-routes on a subnet router (it blackholes the LAN). TJ must approve the login link and the route in the admin console.

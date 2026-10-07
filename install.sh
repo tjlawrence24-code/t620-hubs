@@ -9,7 +9,7 @@ case "$ROLE" in printhub|scanhub) ;; *) echo "usage: sudo $0 printhub|scanhub"; 
 
 REPO="$(cd "$(dirname "$0")" && pwd)"
 USER_NAME=tjlawre24
-PRINTER_IP="${PRINTER_IP:-192.168.1.243}"   # QIDI X-Plus 4 (Moonraker)
+PRINTER_IP="${PRINTER_IP:-192.168.1.223}"   # QIDI X-Plus 4 (Moonraker)
 LOG=/var/log/$ROLE-setup.log
 exec > >(tee -a "$LOG") 2>&1
 echo "=== $ROLE setup $(date) ==="
