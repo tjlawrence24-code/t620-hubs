@@ -20,7 +20,7 @@ Both: avahi (`<hub>.local`), OpenSSH with TJ's Mac key, passwordless sudo, fail2
 Or let Claude Code do it: `cd t620-hubs && claude` and say "set this box up" — it reads `CLAUDE.md`.
 
 ## No network
-- **Wi-Fi** (if the box has a card): `sudo nmtui` is not on Server; use netplan:
+- **Wi-Fi**: after install.sh, run `wifi-setup` (asks for network + password, survives reboots). Any adapter is named `wlan0`.
   ```bash
   sudo tee /etc/netplan/60-wifi.yaml >/dev/null <<'Y'
   network:

@@ -47,9 +47,19 @@ if [ -d /etc/netplan ]; then
   mkdir -p /etc/systemd/system/systemd-networkd-wait-online.service.d
   printf '[Service]\nExecStart=\nExecStart=/usr/lib/systemd/systemd-networkd-wait-online --any --timeout=15\n' \
     > /etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
+  # any Wi-Fi adapter is named wlan0 (netplan's networkd backend can't match Wi-Fi by pattern);
+  # Wi-Fi password is set on the box with wifi-setup, never stored in this repo
+  printf '[Match]\nType=wlan\n\n[Link]\nName=wlan0\n' > /etc/systemd/network/10-wlan0.link
+  install -m755 "$REPO/common/wifi-setup" /usr/local/sbin/wifi-setup
   systemctl daemon-reload
   netplan generate
 fi
+# USB Wi-Fi dongle firmware (Realtek RTL88x2BU etc.); Debian keeps it in non-free-firmware
+if [ -f /etc/apt/sources.list.d/debian.sources ] && ! grep -q non-free-firmware /etc/apt/sources.list.d/debian.sources; then
+  sed -i 's/^Components: main$/Components: main non-free-firmware/' /etc/apt/sources.list.d/debian.sources
+  apt-get update
+fi
+apt-get -y install wpasupplicant iw firmware-realtek 2>/dev/null || apt-get -y install wpasupplicant iw linux-firmware
 systemctl enable --now avahi-daemon ssh fail2ban
 systemctl restart fail2ban
 

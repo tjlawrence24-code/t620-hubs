@@ -1,0 +1,20 @@
+#!/bin/bash
+# Prompts for Wi-Fi name/password and saves it so wlan0 connects on every boot.
+[ "$(id -u)" = 0 ] || exec sudo "$0" "$@"
+read -rp "Wi-Fi name [Lawrence]: " SSID; SSID=${SSID:-Lawrence}
+read -rsp "Wi-Fi password: " PW; echo
+cat > /etc/netplan/20-wifi.yaml <<Y
+network:
+  version: 2
+  wifis:
+    wlan0:
+      dhcp4: true
+      dhcp6: true
+      optional: true
+      access-points:
+        "$SSID": {password: "$PW"}
+Y
+chmod 600 /etc/netplan/20-wifi.yaml
+netplan apply
+echo "Connecting..."; for i in $(seq 1 20); do ip -4 -br a show wlan0 2>/dev/null | grep -q "[0-9]\." && break; sleep 1; done
+ip -4 -br a show wlan0 2>/dev/null | grep "[0-9]\." || echo "Not connected yet - check the password and run wifi-setup again."
