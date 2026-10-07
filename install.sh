@@ -132,7 +132,7 @@ EOF
   sed "s|^PRINTER = .*|PRINTER = \"http://$PRINTER_IP\"|" "$REPO/printhub/backup.py" > "$H/klipper-backup/backup.py"
   chown "$USER_NAME:$USER_NAME" "$H/klipper-backup/backup.py"; chmod 755 "$H/klipper-backup/backup.py"
   CRON="0 3 * * * $H/klipper-backup/backup.py >> $H/klipper-backup/backup.log 2>&1"
-  (crontab -u "$USER_NAME" -l 2>/dev/null | grep -v klipper-backup; echo "$CRON") | crontab -u "$USER_NAME" -
+  { crontab -u "$USER_NAME" -l 2>/dev/null | grep -v klipper-backup || true; echo "$CRON"; } | crontab -u "$USER_NAME" -
   sudo -u "$USER_NAME" "$H/klipper-backup/backup.py" || echo "WARN: printer backup failed - is the printer on at $PRINTER_IP?"
 
   systemctl is-active --quiet caddy
