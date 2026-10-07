@@ -94,7 +94,7 @@ printhub() {
   # Mapping lives in /etc/printhub/cams (edit + run `sudo t620-hubs/install.sh printhub` to re-apply).
   mkdir -p /etc/printhub
   if [ ! -s /etc/printhub/cams ]; then
-    ls /dev/v4l/by-path/*video-index0 2>/dev/null | head -3 > /etc/printhub/cams || true
+    ls /dev/v4l/by-path/*video-index0 2>/dev/null | grep -v usbv2 | head -3 > /etc/printhub/cams || true
   fi
   rm -f /etc/systemd/system/ustreamer-cam*.service
   n=0
