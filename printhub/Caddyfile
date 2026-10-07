@@ -1,0 +1,76 @@
+# QIDI X-Plus 4 print-monitor proxy — 3 USB cams on the Pi (uStreamer 8082/8083/8084)
+#
+# Short URLs (Mac /etc/hosts -> Pi IP):  http://cam1.home  cam2.home  cam3.home
+# Universal (mDNS / remote):  http://printpi.local:8081/cam1 /cam2 /cam3 (+ /snapshot)
+
+(cam1) {
+	rewrite * /stream
+	reverse_proxy 127.0.0.1:8082 {
+		flush_interval -1
+	}
+}
+(cam2) {
+	rewrite * /stream
+	reverse_proxy 127.0.0.1:8083 {
+		flush_interval -1
+	}
+}
+(cam3) {
+	rewrite * /stream
+	reverse_proxy 127.0.0.1:8084 {
+		flush_interval -1
+	}
+}
+(snap1) {
+	rewrite * /snapshot
+	reverse_proxy 127.0.0.1:8082
+}
+(snap2) {
+	rewrite * /snapshot
+	reverse_proxy 127.0.0.1:8083
+}
+(snap3) {
+	rewrite * /snapshot
+	reverse_proxy 127.0.0.1:8084
+}
+
+http://cam1.home {
+	import cam1
+}
+http://cam2.home {
+	import cam2
+}
+http://cam3.home {
+	import cam3
+}
+
+:8081 {
+	@c1 path /cam1 /cam1/ /1
+	@c2 path /cam2 /cam2/ /2
+	@c3 path /cam3 /cam3/ /3
+	@s1 path /cam1/snapshot /1/snapshot
+	@s2 path /cam2/snapshot /2/snapshot
+	@s3 path /cam3/snapshot /3/snapshot
+
+	handle @s1 {
+		import snap1
+	}
+	handle @s2 {
+		import snap2
+	}
+	handle @s3 {
+		import snap3
+	}
+	handle @c1 {
+		import cam1
+	}
+	handle @c2 {
+		import cam2
+	}
+	handle @c3 {
+		import cam3
+	}
+	handle {
+		respond "QIDI cameras: /cam1 /cam2 /cam3" 200
+	}
+}

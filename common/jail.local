@@ -1,0 +1,10 @@
+[DEFAULT]
+# never ban the home LAN or the tailnet
+ignoreip = 127.0.0.1/8 ::1 192.168.1.0/24 100.64.0.0/10
+backend = systemd
+bantime = 3600
+findtime = 600
+maxretry = 5
+
+[sshd]
+enabled = true
